@@ -15,13 +15,6 @@ export default function ClientDashboard() {
   const columns: ColumnDef<DashboardRow, unknown>[] = useMemo(
     () => [
       {
-        accessorKey: 'session_id',
-        header: 'Session ID',
-        cell: ({ getValue }) => (
-          <span className="font-mono text-xs">{getValue<string>()}</span>
-        ),
-      },
-      {
         accessorKey: 'customer_name',
         header: 'Customer Name',
         cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
@@ -37,16 +30,8 @@ export default function ClientDashboard() {
         },
       },
       {
-        accessorKey: 'total_test_duration_display',
-        header: 'Duration',
-      },
-      {
-        accessorKey: 'total_steps',
-        header: 'Steps',
-      },
-      {
         id: 'manual_rx',
-        header: 'Manual Rx Check',
+        header: 'Manual Rx',
         cell: ({ row }) => (
           <ManualRxEditor
             sessionId={row.original.session_id}

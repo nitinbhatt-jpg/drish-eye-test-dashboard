@@ -19,8 +19,7 @@ function fmtDev(val: number | null): string {
 function deviationClass(val: number | null, threshold: number): string {
   if (val == null) return 'text-muted-foreground';
   if (val <= threshold) return 'text-green-600 dark:text-green-400';
-  if (val <= threshold * 2) return 'text-yellow-600 dark:text-yellow-400';
-  return 'text-red-600 dark:text-red-400';
+  return 'text-red-600 dark:text-red-400 underline';
 }
 
 export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
@@ -47,7 +46,7 @@ export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
         </span>
         <span>
           <span className="text-muted-foreground font-normal">Axis:</span>{' '}
-          <span className={deviationClass(dAxis, 5)}>{fmtDev(dAxis)}</span>
+          <span className={deviationClass(dAxis, 10)}>{fmtDev(dAxis)}</span>
         </span>
         <span>
           <span className="text-muted-foreground font-normal">Add:</span>{' '}
