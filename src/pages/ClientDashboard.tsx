@@ -1,5 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useSessionData } from '@/hooks/useSessionData';
 import { MetricsSummary } from '@/components/dashboard/MetricsSummary';
 import { DataTable } from '@/components/dashboard/DataTable';
@@ -9,8 +9,17 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import type { DashboardRow } from '@/types';
 
+type RxFilter = 'all' | 'filled' | 'empty';
+
 export default function ClientDashboard() {
   const { rows, loading, error, reload, updateManualRx } = useSessionData();
+  const [rxFilter, setRxFilter] = useState<RxFilter>('all');
+
+  const filteredRows = useMemo(() => {
+    if (rxFilter === 'all') return rows;
+    if (rxFilter === 'filled') return rows.filter((r) => r.manual_rx != null);
+    return rows.filter((r) => r.manual_rx == null);
+  }, [rows, rxFilter]);
 
   const columns: ColumnDef<DashboardRow, unknown>[] = useMemo(
     () => [
@@ -66,13 +75,26 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Client Dashboard</h2>
+        <h2 className="text-2xl font-bold">Optum Dashboard</h2>
         <Button variant="outline" size="sm" onClick={reload}>
           <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Refresh
         </Button>
       </div>
-      <MetricsSummary rows={rows} />
-      <DataTable columns={columns} data={rows} />
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-muted-foreground">Manual Rx:</span>
+        {(['all', 'filled', 'empty'] as RxFilter[]).map((f) => (
+          <Button
+            key={f}
+            variant={rxFilter === f ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setRxFilter(f)}
+          >
+            {f === 'all' ? 'All' : f === 'filled' ? 'Filled' : 'Empty'}
+          </Button>
+        ))}
+      </div>
+      <MetricsSummary rows={filteredRows} />
+      <DataTable columns={columns} data={filteredRows} />
     </div>
   );
 }
