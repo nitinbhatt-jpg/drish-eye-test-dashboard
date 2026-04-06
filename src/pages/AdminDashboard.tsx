@@ -1,15 +1,17 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useSessionData } from '@/hooks/useSessionData';
-import { MetricsSummary } from '@/components/dashboard/MetricsSummary';
+import { AdminMetricsSummary } from '@/components/dashboard/AdminMetricsSummary';
 import { DataTable } from '@/components/dashboard/DataTable';
 import { EyePowerDisplay } from '@/components/dashboard/EyePowerDisplay';
 import { ManualRxEditor } from '@/components/dashboard/ManualRxEditor';
 import { DeviationDisplay } from '@/components/dashboard/DeviationDisplay';
 import { AccuracyDisplay } from '@/components/dashboard/AccuracyDisplay';
+import { DateFilter } from '@/components/dashboard/DateFilter';
+import { SessionDetailPanel } from '@/components/dashboard/SessionDetailPanel';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ChevronRight } from 'lucide-react';
 import type { DashboardRow } from '@/types';
 
 type RxFilter = 'all' | 'filled' | 'empty';
@@ -17,22 +19,37 @@ type RxFilter = 'all' | 'filled' | 'empty';
 export default function AdminDashboard() {
   const { rows, loading, error, reload, updateManualRx } = useSessionData();
   const [rxFilter, setRxFilter] = useState<RxFilter>('all');
+  const [dateStart, setDateStart] = useState<Date | null>(null);
+  const [dateEnd, setDateEnd] = useState<Date | null>(null);
+  const [selectedRow, setSelectedRow] = useState<DashboardRow | null>(null);
+
+  const handleDateChange = useCallback((start: Date | null, end: Date | null) => {
+    setDateStart(start);
+    setDateEnd(end);
+  }, []);
 
   const filteredRows = useMemo(() => {
-    if (rxFilter === 'all') return rows;
-    if (rxFilter === 'filled') return rows.filter((r) => r.manual_rx != null);
-    return rows.filter((r) => r.manual_rx == null);
-  }, [rows, rxFilter]);
+    let result = rows;
+
+    // Rx filter
+    if (rxFilter === 'filled') result = result.filter((r) => r.manual_rx != null);
+    else if (rxFilter === 'empty') result = result.filter((r) => r.manual_rx == null);
+
+    // Date filter
+    if (dateStart || dateEnd) {
+      result = result.filter((r) => {
+        const d = new Date(r.session_start_time);
+        if (dateStart && d < dateStart) return false;
+        if (dateEnd && d > dateEnd) return false;
+        return true;
+      });
+    }
+
+    return result;
+  }, [rows, rxFilter, dateStart, dateEnd]);
 
   const columns: ColumnDef<DashboardRow, unknown>[] = useMemo(
     () => [
-      {
-        accessorKey: 'session_id',
-        header: 'Session ID',
-        cell: ({ getValue }) => (
-          <span className="font-mono text-xs">{getValue<string>()}</span>
-        ),
-      },
       {
         accessorKey: 'customer_name',
         header: 'Customer Name',
@@ -49,8 +66,23 @@ export default function AdminDashboard() {
         },
       },
       {
+        id: 'manual_rx',
+        header: 'Manual Rx',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <ManualRxEditor
+              sessionId={row.original.session_id}
+              manualRx={row.original.manual_rx}
+              onSaved={(rx) => updateManualRx(row.original.session_id, rx)}
+            />
+          </div>
+        ),
+      },
+      {
         id: 'ai_prescription',
         header: 'Self ET Power (AI)',
+        enableSorting: false,
         cell: ({ row }) => {
           const rx = row.original.final_prescription;
           return (
@@ -64,6 +96,7 @@ export default function AdminDashboard() {
       {
         id: 'accuracy',
         header: 'Accuracy',
+        enableSorting: false,
         cell: ({ row }) => (
           <AccuracyDisplay
             ai={row.original.final_prescription}
@@ -72,19 +105,9 @@ export default function AdminDashboard() {
         ),
       },
       {
-        id: 'manual_rx',
-        header: 'Manual Rx Check',
-        cell: ({ row }) => (
-          <ManualRxEditor
-            sessionId={row.original.session_id}
-            manualRx={row.original.manual_rx}
-            onSaved={(rx) => updateManualRx(row.original.session_id, rx)}
-          />
-        ),
-      },
-      {
         id: 'deviation',
         header: 'Deviation (|M - AI|)',
+        enableSorting: false,
         cell: ({ row }) => {
           const ai = row.original.final_prescription;
           const m = row.original.manual_rx;
@@ -106,8 +129,12 @@ export default function AdminDashboard() {
         header: 'Duration',
       },
       {
-        accessorKey: 'total_steps',
-        header: 'Steps',
+        id: 'detail',
+        header: '',
+        enableSorting: false,
+        cell: () => (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        ),
       },
     ],
     [updateManualRx],
@@ -140,21 +167,37 @@ export default function AdminDashboard() {
           <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Refresh
         </Button>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Manual Rx:</span>
-        {(['all', 'filled', 'empty'] as RxFilter[]).map((f) => (
-          <Button
-            key={f}
-            variant={rxFilter === f ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setRxFilter(f)}
-          >
-            {f === 'all' ? 'All' : f === 'filled' ? 'Filled' : 'Empty'}
-          </Button>
-        ))}
+
+      <AdminMetricsSummary rows={filteredRows} />
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-4">
+        <DateFilter onFilterChange={handleDateChange} />
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-sm font-medium text-muted-foreground">Manual Rx:</span>
+          {(['all', 'filled', 'empty'] as RxFilter[]).map((f) => (
+            <Button
+              key={f}
+              variant={rxFilter === f ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setRxFilter(f)}
+            >
+              {f === 'all' ? 'All' : f === 'filled' ? 'Filled' : 'Empty'}
+            </Button>
+          ))}
+        </div>
       </div>
-      <MetricsSummary rows={filteredRows} />
-      <DataTable columns={columns} data={filteredRows} />
+
+      <DataTable
+        columns={columns}
+        data={filteredRows}
+        onRowClick={(row) => setSelectedRow(row)}
+      />
+
+      <SessionDetailPanel
+        row={selectedRow}
+        onClose={() => setSelectedRow(null)}
+      />
     </div>
   );
 }
