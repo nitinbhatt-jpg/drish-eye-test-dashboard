@@ -10,12 +10,14 @@ function collectScores(
   mSph: number | null,
   mCyl: number | null,
   mAxis: number | null,
+  mAdd: number | null,
 ): number[] {
   if (!ai) return [];
   const scores: number[] = [];
   if (ai.sph != null && mSph != null) scores.push(Math.abs(ai.sph - mSph) <= 0.25 ? 1 : 0);
   if (ai.cyl != null && mCyl != null) scores.push(Math.abs(ai.cyl - mCyl) <= 0.25 ? 1 : 0);
   if (ai.axis != null && mAxis != null) scores.push(Math.abs(ai.axis - mAxis) <= 10 ? 1 : 0);
+  if (ai.add != null && mAdd != null) scores.push(Math.abs(ai.add - mAdd) <= 0.25 ? 1 : 0);
   return scores;
 }
 
@@ -30,8 +32,8 @@ export function AccuracyDisplay({ ai, manual }: AccuracyDisplayProps) {
     return <span className="text-sm text-muted-foreground italic">Enter Manual Rx</span>;
   }
 
-  const rightScores = collectScores(ai.right, manual.right_sph, manual.right_cyl, manual.right_axis);
-  const leftScores = collectScores(ai.left, manual.left_sph, manual.left_cyl, manual.left_axis);
+  const rightScores = collectScores(ai.right, manual.right_sph, manual.right_cyl, manual.right_axis, manual.right_add);
+  const leftScores = collectScores(ai.left, manual.left_sph, manual.left_cyl, manual.left_axis, manual.left_add);
   const allScores = [...rightScores, ...leftScores];
 
   if (allScores.length === 0) {
