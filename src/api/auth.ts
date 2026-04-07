@@ -1,13 +1,34 @@
 import { supabase } from '@/lib/supabase';
 import type { Profile, UserRole } from '@/types';
 
+const ALLOWED_EMAILS = new Set([
+  'abhishek.abhishek3@fos.lenskart.in',
+  'shruti.shruti3@fos.lenskart.in',
+  'shariq.rehan@fos.lenskart.in',
+  'manisha.manisha1@fos.lenskart.in',
+  'raman.ganguly@fos.lenskart.in',
+  'debannita.pal@fos.lenskart.in',
+  'pratik.sarkar@fos.lenskart.in',
+  'rimi.das@fos.lenskart.in',
+  'yogesh.kumar3@fos.lenskart.in',
+  'priya.das@fos.lenskart.in',
+]);
+
+function assertAllowedEmail(email: string) {
+  if (!ALLOWED_EMAILS.has(email.toLowerCase().trim())) {
+    throw new Error('This email is not authorised to access the dashboard.');
+  }
+}
+
 export async function signUp(email: string, password: string) {
+  assertAllowedEmail(email);
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) throw error;
   return data;
 }
 
 export async function signIn(email: string, password: string) {
+  assertAllowedEmail(email);
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
