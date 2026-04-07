@@ -12,6 +12,8 @@ const ALLOWED_EMAILS = new Set([
   'rimi.das@fos.lenskart.in',
   'yogesh.kumar3@fos.lenskart.in',
   'priya.das@fos.lenskart.in',
+  'chirayu.maru@lenskart.com',
+  'nitin.bhatt@lenskart.com',
 ]);
 
 function assertAllowedEmail(email: string) {
