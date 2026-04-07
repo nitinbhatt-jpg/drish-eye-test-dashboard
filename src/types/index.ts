@@ -51,6 +51,7 @@ export interface ManualRx {
   right_axis: number | null;
   right_add: number | null;
   updated_by: string | null;
+  updated_by_email: string | null;
   updated_at: string;
   created_at: string;
 }

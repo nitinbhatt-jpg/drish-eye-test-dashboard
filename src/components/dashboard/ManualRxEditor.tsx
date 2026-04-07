@@ -112,6 +112,11 @@ export function ManualRxEditor({ sessionId, manualRx, onSaved }: ManualRxEditorP
             </div>
           </div>
         </div>
+        {manualRx?.updated_by_email && (
+          <p className="text-[10px] text-muted-foreground">
+            by {manualRx.updated_by_email.split('@')[0]}
+          </p>
+        )}
         <Button variant="ghost" size="sm" onClick={handleOpen} className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground">
           <PenLine className="h-3 w-3" /> Edit
         </Button>

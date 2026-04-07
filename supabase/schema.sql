@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS public.manual_rx (
   right_axis NUMERIC,
   right_add NUMERIC,
   updated_by UUID REFERENCES auth.users(id),
+  updated_by_email TEXT,
   updated_at TIMESTAMPTZ DEFAULT now(),
   created_at TIMESTAMPTZ DEFAULT now()
 );

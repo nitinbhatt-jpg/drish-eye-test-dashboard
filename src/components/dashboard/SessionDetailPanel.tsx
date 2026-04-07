@@ -106,7 +106,7 @@ export function SessionDetailPanel({ row, onClose }: SessionDetailPanelProps) {
           <div>
             <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Manual Rx</p>
             {m ? (
-              <div className="rounded-lg border bg-card p-4 space-y-1 text-sm">
+              <div className="rounded-lg border bg-card p-4 space-y-2 text-sm">
                 <p>
                   <span className="font-medium text-muted-foreground">R:</span>{' '}
                   {fmtVal(m.right_sph)} / {fmtVal(m.right_cyl)} x {m.right_axis ?? '—'}{' '}
@@ -117,6 +117,14 @@ export function SessionDetailPanel({ row, onClose }: SessionDetailPanelProps) {
                   {fmtVal(m.left_sph)} / {fmtVal(m.left_cyl)} x {m.left_axis ?? '—'}{' '}
                   {m.left_add != null && <span>add {fmtVal(m.left_add)}</span>}
                 </p>
+                {m.updated_by_email && (
+                  <p className="text-xs text-muted-foreground pt-1 border-t">
+                    Filled by <span className="font-medium">{m.updated_by_email}</span>
+                    {m.updated_at && (
+                      <> on {new Date(m.updated_at).toLocaleDateString()}</>
+                    )}
+                  </p>
+                )}
               </div>
             ) : (
               <div className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground italic">

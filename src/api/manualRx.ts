@@ -28,6 +28,7 @@ export async function upsertManualRx(input: ManualRxInput): Promise<ManualRx> {
         right_axis: input.right_axis,
         right_add: input.right_add,
         updated_by: user?.id,
+        updated_by_email: user?.email ?? null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'session_id' },
