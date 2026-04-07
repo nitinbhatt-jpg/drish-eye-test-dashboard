@@ -11,8 +11,15 @@ import { DateFilter } from '@/components/dashboard/DateFilter';
 import { SessionDetailPanel } from '@/components/dashboard/SessionDetailPanel';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, ChevronRight, Download } from 'lucide-react';
+import { RefreshCw, ChevronRight, Download, FileSpreadsheet, FileText } from 'lucide-react';
 import type { DashboardRow } from '@/types';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const BUCKET = 'Eye_Test_logs';
+
+function storageUrl(fileName: string): string {
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
+}
 
 function fmtNum(val: number | null | undefined): string {
   if (val == null) return '';
@@ -97,7 +104,34 @@ export default function AdminDashboard() {
       {
         accessorKey: 'customer_name',
         header: 'Customer Name',
-        cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
+        cell: ({ row }) => {
+          const sid = row.original.session_id;
+          return (
+            <div>
+              <span className="font-medium">{row.original.customer_name}</span>
+              <div className="flex items-center gap-2 mt-1">
+                <a
+                  href={storageUrl(`${sid}.csv`)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 text-[10px] text-blue-500 hover:underline"
+                >
+                  <FileSpreadsheet className="h-3 w-3" /> CSV
+                </a>
+                <a
+                  href={storageUrl(`${sid}_metadata.json`)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 text-[10px] text-blue-500 hover:underline"
+                >
+                  <FileText className="h-3 w-3" /> Metadata
+                </a>
+              </div>
+            </div>
+          );
+        },
       },
       {
         accessorKey: 'customer_phone',
