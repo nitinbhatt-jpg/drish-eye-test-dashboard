@@ -11,8 +11,52 @@ import { DateFilter } from '@/components/dashboard/DateFilter';
 import { SessionDetailPanel } from '@/components/dashboard/SessionDetailPanel';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, ChevronRight } from 'lucide-react';
+import { RefreshCw, ChevronRight, Download } from 'lucide-react';
 import type { DashboardRow } from '@/types';
+
+function fmtNum(val: number | null | undefined): string {
+  if (val == null) return '';
+  return val >= 0 ? `+${val.toFixed(2)}` : val.toFixed(2);
+}
+
+function exportToCsv(rows: DashboardRow[]) {
+  const headers = [
+    'Customer Name',
+    'Phone',
+    'Session Date',
+    'Duration',
+    'AI Right Sph', 'AI Right Cyl', 'AI Right Axis', 'AI Right Add',
+    'AI Left Sph', 'AI Left Cyl', 'AI Left Axis', 'AI Left Add',
+    'Manual Right Sph', 'Manual Right Cyl', 'Manual Right Axis', 'Manual Right Add',
+    'Manual Left Sph', 'Manual Left Cyl', 'Manual Left Axis', 'Manual Left Add',
+    'Filled By',
+  ];
+
+  const csvRows = rows.map((r) => {
+    const ai = r.final_prescription;
+    const m = r.manual_rx;
+    return [
+      r.customer_name,
+      r.customer_phone,
+      r.session_start_time ? new Date(r.session_start_time).toLocaleString() : '',
+      r.total_test_duration_display,
+      fmtNum(ai?.right?.sph), fmtNum(ai?.right?.cyl), ai?.right?.axis ?? '', fmtNum(ai?.right?.add),
+      fmtNum(ai?.left?.sph), fmtNum(ai?.left?.cyl), ai?.left?.axis ?? '', fmtNum(ai?.left?.add),
+      fmtNum(m?.right_sph), fmtNum(m?.right_cyl), m?.right_axis ?? '', fmtNum(m?.right_add),
+      fmtNum(m?.left_sph), fmtNum(m?.left_cyl), m?.left_axis ?? '', fmtNum(m?.left_add),
+      m?.updated_by_email ?? '',
+    ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',');
+  });
+
+  const csv = [headers.join(','), ...csvRows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `drish-eye-tests-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 type RxFilter = 'all' | 'filled' | 'empty';
 
@@ -163,9 +207,14 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-        <Button variant="outline" size="sm" onClick={reload}>
-          <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => exportToCsv(filteredRows)}>
+            <Download className="mr-1.5 h-3.5 w-3.5" /> CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={reload}>
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Refresh
+          </Button>
+        </div>
       </div>
 
       <AdminMetricsSummary rows={filteredRows} />
