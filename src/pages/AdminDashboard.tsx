@@ -94,15 +94,8 @@ export default function AdminDashboard() {
         },
       },
       {
-        id: 'accuracy',
-        header: 'Accuracy',
-        enableSorting: false,
-        cell: ({ row }) => (
-          <AccuracyDisplay
-            ai={row.original.final_prescription}
-            manual={row.original.manual_rx}
-          />
-        ),
+        accessorKey: 'total_test_duration_display',
+        header: 'Duration',
       },
       {
         id: 'deviation',
@@ -125,8 +118,15 @@ export default function AdminDashboard() {
         },
       },
       {
-        accessorKey: 'total_test_duration_display',
-        header: 'Duration',
+        id: 'accuracy',
+        header: 'Accuracy',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <AccuracyDisplay
+            ai={row.original.final_prescription}
+            manual={row.original.manual_rx}
+          />
+        ),
       },
       {
         id: 'detail',

@@ -6,6 +6,11 @@ import { upsertManualRx } from '@/api/manualRx';
 import type { ManualRx } from '@/types';
 import { toast } from 'sonner';
 
+function fmtVal(val: number | null | undefined): string {
+  if (val == null) return '—';
+  return val >= 0 ? `+${val.toFixed(2)}` : val.toFixed(2);
+}
+
 interface ManualRxEditorProps {
   sessionId: string;
   manualRx: ManualRx | null;
@@ -87,9 +92,25 @@ export function ManualRxEditor({ sessionId, manualRx, onSaved }: ManualRxEditorP
 
     return (
       <div className="space-y-1">
-        <div className="text-sm">
-          <p><span className="font-medium text-muted-foreground">R:</span> {manualRx!.right_sph ?? '—'} / {manualRx!.right_cyl ?? '—'} x {manualRx!.right_axis ?? '—'} {manualRx!.right_add != null ? `add ${manualRx!.right_add}` : ''}</p>
-          <p><span className="font-medium text-muted-foreground">L:</span> {manualRx!.left_sph ?? '—'} / {manualRx!.left_cyl ?? '—'} x {manualRx!.left_axis ?? '—'} {manualRx!.left_add != null ? `add ${manualRx!.left_add}` : ''}</p>
+        <div className="space-y-1.5">
+          <div className="space-y-0.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase">Right</p>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm">
+              <span><span className="text-muted-foreground">Sph:</span> {fmtVal(manualRx!.right_sph)}</span>
+              <span><span className="text-muted-foreground">Cyl:</span> {fmtVal(manualRx!.right_cyl)}</span>
+              <span><span className="text-muted-foreground">Axis:</span> {manualRx!.right_axis ?? '—'}</span>
+              <span><span className="text-muted-foreground">Add:</span> {fmtVal(manualRx!.right_add)}</span>
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase">Left</p>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm">
+              <span><span className="text-muted-foreground">Sph:</span> {fmtVal(manualRx!.left_sph)}</span>
+              <span><span className="text-muted-foreground">Cyl:</span> {fmtVal(manualRx!.left_cyl)}</span>
+              <span><span className="text-muted-foreground">Axis:</span> {manualRx!.left_axis ?? '—'}</span>
+              <span><span className="text-muted-foreground">Add:</span> {fmtVal(manualRx!.left_add)}</span>
+            </div>
+          </div>
         </div>
         <Button variant="ghost" size="sm" onClick={handleOpen} className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground">
           <PenLine className="h-3 w-3" /> Edit
