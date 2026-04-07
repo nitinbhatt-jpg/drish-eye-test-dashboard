@@ -61,11 +61,19 @@ RETURNS TEXT AS $$
   SELECT role FROM public.profiles WHERE id = user_id;
 $$ LANGUAGE sql SECURITY DEFINER;
 
--- 4. Auto-create profile on user signup
+-- 4. Auto-create profile on user signup (admin emails get 'admin' role)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, role) VALUES (NEW.id, 'client');
+  IF NEW.email IN (
+    'nitin.bhatt@lenskart.com',
+    'shantanu.chandra@lenskart.com',
+    'siddarth.gupta@lenskart.com'
+  ) THEN
+    INSERT INTO public.profiles (id, role) VALUES (NEW.id, 'admin');
+  ELSE
+    INSERT INTO public.profiles (id, role) VALUES (NEW.id, 'client');
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

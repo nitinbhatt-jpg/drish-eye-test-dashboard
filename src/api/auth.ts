@@ -14,14 +14,28 @@ const CLIENT_EMAILS = new Set([
   'priya.das@fos.lenskart.in',
 ]);
 
-const DEFAULT_CLIENT_PASSWORD = 'Lenskart@123';
+const ADMIN_EMAILS = new Set([
+  'nitin.bhatt@lenskart.com',
+  'shantanu.chandra@lenskart.com',
+  'siddarth.gupta@lenskart.com',
+]);
+
+const DEFAULT_PASSWORD = 'Lenskart@123';
 
 function isClientEmail(email: string): boolean {
   return CLIENT_EMAILS.has(email.toLowerCase().trim());
 }
 
+function isAdminEmail(email: string): boolean {
+  return ADMIN_EMAILS.has(email.toLowerCase().trim());
+}
+
+function isAllowedEmail(email: string): boolean {
+  return isClientEmail(email) || isAdminEmail(email);
+}
+
 export async function signUp(email: string, password: string) {
-  if (!isClientEmail(email)) {
+  if (!isAllowedEmail(email)) {
     throw new Error('Signup is restricted to authorised emails only.');
   }
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -29,36 +43,33 @@ export async function signUp(email: string, password: string) {
   return data;
 }
 
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, _password?: string) {
   const normalised = email.toLowerCase().trim();
 
-  if (isClientEmail(normalised)) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: normalised,
-      password: DEFAULT_CLIENT_PASSWORD,
-    });
-
-    if (!error) return data;
-
-    // First-time login: auto-register with the default password, then sign in
-    const { error: signUpErr } = await supabase.auth.signUp({
-      email: normalised,
-      password: DEFAULT_CLIENT_PASSWORD,
-    });
-    if (signUpErr) throw signUpErr;
-
-    const { data: retryData, error: retryErr } = await supabase.auth.signInWithPassword({
-      email: normalised,
-      password: DEFAULT_CLIENT_PASSWORD,
-    });
-    if (retryErr) throw retryErr;
-    return retryData;
+  if (!isAllowedEmail(normalised)) {
+    throw new Error('This email is not authorised to access the dashboard.');
   }
 
-  // Admin / non-client emails: standard login with whatever password they provide
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw error;
-  return data;
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: normalised,
+    password: DEFAULT_PASSWORD,
+  });
+
+  if (!error) return data;
+
+  // First-time login: auto-register with the default password, then sign in
+  const { error: signUpErr } = await supabase.auth.signUp({
+    email: normalised,
+    password: DEFAULT_PASSWORD,
+  });
+  if (signUpErr) throw signUpErr;
+
+  const { data: retryData, error: retryErr } = await supabase.auth.signInWithPassword({
+    email: normalised,
+    password: DEFAULT_PASSWORD,
+  });
+  if (retryErr) throw retryErr;
+  return retryData;
 }
 
 export async function signOut() {
