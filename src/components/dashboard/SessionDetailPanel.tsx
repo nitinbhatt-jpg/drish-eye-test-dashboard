@@ -88,7 +88,7 @@ export function SessionDetailPanel({ row, onClose }: SessionDetailPanelProps) {
             <span>&bull;</span>
             <span>{new Date(row.session_start_time).toLocaleDateString()}</span>
             <span>&bull;</span>
-            <span>{row.total_test_duration_display}</span>
+            <span>{row.test_duration_display}</span>
             <span>&bull;</span>
             <span>{row.total_steps} steps</span>
           </div>
@@ -152,7 +152,7 @@ export function SessionDetailPanel({ row, onClose }: SessionDetailPanelProps) {
             </div>
             <div className="rounded-lg border bg-card p-4 text-center">
               <p className="text-xs text-muted-foreground uppercase mb-1">Duration</p>
-              <p className="text-2xl font-bold">{row.total_test_duration_display}</p>
+              <p className="text-2xl font-bold">{row.test_duration_display}</p>
               <p className="text-xs text-muted-foreground">{row.total_steps} steps</p>
             </div>
           </div>

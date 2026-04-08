@@ -46,7 +46,7 @@ function exportToCsv(rows: DashboardRow[]) {
       r.customer_name,
       r.customer_phone,
       r.session_start_time ? new Date(r.session_start_time).toLocaleString() : '',
-      r.total_test_duration_display,
+      r.test_duration_display,
       fmtNum(ai?.right?.sph), fmtNum(ai?.right?.cyl), ai?.right?.axis ?? '', fmtNum(ai?.right?.add),
       fmtNum(ai?.left?.sph), fmtNum(ai?.left?.cyl), ai?.left?.axis ?? '', fmtNum(ai?.left?.add),
       fmtNum(m?.right_sph), fmtNum(m?.right_cyl), m?.right_axis ?? '', fmtNum(m?.right_add),
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
         },
       },
       {
-        accessorKey: 'total_test_duration_display',
+        accessorKey: 'test_duration_display',
         header: 'Duration',
       },
       {

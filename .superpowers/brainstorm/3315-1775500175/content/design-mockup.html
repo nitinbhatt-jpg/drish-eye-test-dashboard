@@ -1,0 +1,172 @@
+<h2>Dashboard Design — Final Layout</h2>
+<p class="subtitle">Here's how your improved Admin Dashboard will look</p>
+
+<div class="mockup">
+  <div class="mockup-header">Admin Dashboard — New Layout</div>
+  <div class="mockup-body" style="padding:0;background:#0a0a0a;color:#fafafa;font-family:system-ui,sans-serif;">
+
+    <!-- Metrics Cards Row -->
+    <div style="padding:20px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+      <div style="background:#141414;border:1px solid #262626;border-radius:8px;padding:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Total AI Tests</div>
+        <div style="font-size:28px;font-weight:700;color:#3b82f6;margin-top:4px;">142</div>
+      </div>
+      <div style="background:#141414;border:1px solid #262626;border-radius:8px;padding:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Manual Rx Done</div>
+        <div style="font-size:28px;font-weight:700;color:#22c55e;margin-top:4px;">98</div>
+      </div>
+      <div style="background:#141414;border:1px solid #262626;border-radius:8px;padding:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Pending Rx</div>
+        <div style="font-size:28px;font-weight:700;color:#f59e0b;margin-top:4px;">44</div>
+      </div>
+      <div style="background:#141414;border:1px solid #262626;border-radius:8px;padding:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Avg Accuracy</div>
+        <div style="font-size:28px;font-weight:700;color:#22c55e;margin-top:4px;">87%</div>
+      </div>
+      <div style="background:#141414;border:1px solid #262626;border-radius:8px;padding:16px;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">High Deviation</div>
+        <div style="font-size:28px;font-weight:700;color:#ef4444;margin-top:4px;">12</div>
+      </div>
+    </div>
+
+    <!-- Filters Row -->
+    <div style="padding:0 20px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;gap:4px;">
+        <button style="background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">Today</button>
+        <button style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">This Week</button>
+        <button style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">This Month</button>
+        <button style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">All Time</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;margin-left:8px;">
+        <input type="date" style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:12px;" />
+        <span style="color:#666;font-size:12px;">to</span>
+        <input type="date" style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:5px 8px;font-size:12px;" />
+      </div>
+      <div style="margin-left:auto;display:flex;gap:4px;">
+        <button style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">All</button>
+        <button style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">Filled</button>
+        <button style="background:#1e1e1e;color:#aaa;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;">Empty</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="padding:0 20px 20px;">
+      <div style="border:1px solid #262626;border-radius:8px;overflow:hidden;">
+        <!-- Sticky Header -->
+        <div style="display:grid;grid-template-columns:1.2fr 1fr 2fr 1fr 0.8fr 0.5fr;background:#1a1a1a;border-bottom:1px solid #333;padding:10px 16px;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;position:sticky;top:0;">
+          <span>Customer</span>
+          <span>Phone</span>
+          <span>Manual Rx (R / L)</span>
+          <span>AI Power</span>
+          <span>Accuracy</span>
+          <span style="text-align:center;">&#x25B6;</span>
+        </div>
+
+        <!-- Row 1 — with Rx filled, inline display -->
+        <div style="display:grid;grid-template-columns:1.2fr 1fr 2fr 1fr 0.8fr 0.5fr;padding:12px 16px;border-bottom:1px solid #1e1e1e;align-items:center;cursor:pointer;" onmouseover="this.style.background='#141414'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight:600;font-size:14px;">Rahul Sharma</span>
+          <span style="font-family:monospace;font-size:12px;color:#aaa;">9876543210</span>
+          <div style="font-size:11px;line-height:1.6;">
+            <div><span style="color:#888;">R:</span> <span style="color:#ccc;">+1.25</span> / <span style="color:#ccc;">-0.50</span> / <span style="color:#ccc;">90</span> / <span style="color:#ccc;">+1.00</span></div>
+            <div><span style="color:#888;">L:</span> <span style="color:#ccc;">+0.75</span> / <span style="color:#ccc;">-0.25</span> / <span style="color:#ccc;">180</span> / <span style="color:#ccc;">+1.00</span></div>
+          </div>
+          <div style="font-size:11px;line-height:1.6;color:#888;">
+            <div>R: +1.50 / -0.50 / 85</div>
+            <div>L: +0.75 / -0.50 / 175</div>
+          </div>
+          <span style="font-size:16px;font-weight:700;color:#22c55e;">88%</span>
+          <span style="text-align:center;color:#555;font-size:14px;">&#x25B6;</span>
+        </div>
+
+        <!-- Row 2 — no Rx -->
+        <div style="display:grid;grid-template-columns:1.2fr 1fr 2fr 1fr 0.8fr 0.5fr;padding:12px 16px;border-bottom:1px solid #1e1e1e;align-items:center;cursor:pointer;" onmouseover="this.style.background='#141414'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight:600;font-size:14px;">Priya Patel</span>
+          <span style="font-family:monospace;font-size:12px;color:#aaa;">9123456789</span>
+          <div style="font-size:12px;color:#f59e0b;font-style:italic;">Pending — click to enter</div>
+          <div style="font-size:11px;line-height:1.6;color:#888;">
+            <div>R: -2.00 / -1.00 / 45</div>
+            <div>L: -1.75 / -0.75 / 135</div>
+          </div>
+          <span style="font-size:12px;color:#666;">—</span>
+          <span style="text-align:center;color:#555;font-size:14px;">&#x25B6;</span>
+        </div>
+
+        <!-- Row 3 — with Rx, red accuracy -->
+        <div style="display:grid;grid-template-columns:1.2fr 1fr 2fr 1fr 0.8fr 0.5fr;padding:12px 16px;align-items:center;cursor:pointer;" onmouseover="this.style.background='#141414'" onmouseout="this.style.background='transparent'">
+          <span style="font-weight:600;font-size:14px;">Amit Kumar</span>
+          <span style="font-family:monospace;font-size:12px;color:#aaa;">9988776655</span>
+          <div style="font-size:11px;line-height:1.6;">
+            <div><span style="color:#888;">R:</span> <span style="color:#ccc;">-3.00</span> / <span style="color:#ccc;">-1.50</span> / <span style="color:#ccc;">10</span> / <span style="color:#ccc;">—</span></div>
+            <div><span style="color:#888;">L:</span> <span style="color:#ccc;">-2.50</span> / <span style="color:#ccc;">-1.25</span> / <span style="color:#ccc;">170</span> / <span style="color:#ccc;">—</span></div>
+          </div>
+          <div style="font-size:11px;line-height:1.6;color:#888;">
+            <div>R: -2.25 / -0.75 / 15</div>
+            <div>L: -2.00 / -0.50 / 160</div>
+          </div>
+          <span style="font-size:16px;font-weight:700;color:#ef4444;text-decoration:underline;">33%</span>
+          <span style="text-align:center;color:#555;font-size:14px;">&#x25B6;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide-out Panel Mockup -->
+<div style="margin-top:24px;">
+  <div class="mockup">
+    <div class="mockup-header">Session Detail — Slide-out Panel (right side)</div>
+    <div class="mockup-body" style="padding:0;background:#0a0a0a;color:#fafafa;font-family:system-ui,sans-serif;">
+      <div style="display:flex;">
+        <!-- Dimmed table behind -->
+        <div style="flex:1;opacity:0.3;padding:20px;">
+          <div style="height:200px;display:flex;align-items:center;justify-content:center;color:#555;">Table (dimmed)</div>
+        </div>
+        <!-- Panel -->
+        <div style="width:420px;background:#141414;border-left:1px solid #333;padding:24px;min-height:350px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="margin:0;font-size:18px;font-weight:700;">Rahul Sharma</h3>
+            <span style="cursor:pointer;color:#666;font-size:20px;">&times;</span>
+          </div>
+          <div style="font-size:12px;color:#888;margin-bottom:16px;">Session: abc-12345 &bull; Apr 6, 2026 &bull; 4m 32s &bull; 12 steps</div>
+
+          <div style="margin-bottom:20px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:8px;letter-spacing:0.5px;">Self ET Power (AI)</div>
+            <div style="background:#1a1a1a;border-radius:6px;padding:12px;font-size:12px;line-height:2;">
+              <div><span style="color:#888;">Right:</span> Sph <span style="color:#3b82f6;">+1.50</span> &nbsp; Cyl <span style="color:#3b82f6;">-0.50</span> &nbsp; Axis <span style="color:#3b82f6;">85</span> &nbsp; Add <span style="color:#3b82f6;">+1.25</span></div>
+              <div><span style="color:#888;">Left:</span>&nbsp; Sph <span style="color:#3b82f6;">+0.75</span> &nbsp; Cyl <span style="color:#3b82f6;">-0.50</span> &nbsp; Axis <span style="color:#3b82f6;">175</span> &nbsp; Add <span style="color:#3b82f6;">+1.00</span></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:8px;letter-spacing:0.5px;">Manual Rx</div>
+            <div style="background:#1a1a1a;border-radius:6px;padding:12px;font-size:12px;line-height:2;">
+              <div><span style="color:#888;">Right:</span> Sph <span style="color:#ccc;">+1.25</span> &nbsp; Cyl <span style="color:#ccc;">-0.50</span> &nbsp; Axis <span style="color:#ccc;">90</span> &nbsp; Add <span style="color:#ccc;">+1.00</span></div>
+              <div><span style="color:#888;">Left:</span>&nbsp; Sph <span style="color:#ccc;">+0.75</span> &nbsp; Cyl <span style="color:#ccc;">-0.25</span> &nbsp; Axis <span style="color:#ccc;">180</span> &nbsp; Add <span style="color:#ccc;">+1.00</span></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;margin-bottom:8px;letter-spacing:0.5px;">Deviation |M - AI|</div>
+            <div style="background:#1a1a1a;border-radius:6px;padding:12px;font-size:12px;line-height:2;">
+              <div><span style="color:#888;">Right:</span> Sph <span style="color:#22c55e;">0.25</span> &nbsp; Cyl <span style="color:#22c55e;">0.00</span> &nbsp; Axis <span style="color:#22c55e;">5</span> &nbsp; Add <span style="color:#22c55e;">0.25</span></div>
+              <div><span style="color:#888;">Left:</span>&nbsp; Sph <span style="color:#22c55e;">0.00</span> &nbsp; Cyl <span style="color:#22c55e;">0.25</span> &nbsp; Axis <span style="color:#22c55e;">5</span> &nbsp; Add <span style="color:#22c55e;">0.00</span></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;background:#1a1a1a;border-radius:6px;padding:12px;text-align:center;">
+              <div style="font-size:11px;color:#888;text-transform:uppercase;">Accuracy</div>
+              <div style="font-size:24px;font-weight:700;color:#22c55e;margin-top:4px;">88%</div>
+              <div style="font-size:10px;color:#666;">7/8 params</div>
+            </div>
+            <div style="flex:1;background:#1a1a1a;border-radius:6px;padding:12px;text-align:center;">
+              <div style="font-size:11px;color:#888;text-transform:uppercase;">Duration</div>
+              <div style="font-size:24px;font-weight:700;color:#ccc;margin-top:4px;">4:32</div>
+              <div style="font-size:10px;color:#666;">12 steps</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

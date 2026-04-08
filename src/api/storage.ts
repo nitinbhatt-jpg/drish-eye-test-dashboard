@@ -46,7 +46,7 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
         customer_phone: json.customer_phone ?? '',
         final_prescription: json.final_prescription ?? { right: { sph: 0, cyl: 0, axis: 0, add: 0 }, left: { sph: 0, cyl: 0, axis: 0, add: 0 } },
         final_distance_va: extractFinalDistanceVA(json),
-        total_test_duration_display: json.total_test_duration_display ?? '—',
+        test_duration_display: json.test_duration_display ?? '—',
         total_steps: json.total_steps ?? 0,
         session_start_time: json.session_start_time ?? '',
       } satisfies SessionData;

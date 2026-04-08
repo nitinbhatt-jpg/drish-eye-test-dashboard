@@ -34,7 +34,7 @@ export interface SessionData {
   customer_phone: string;
   final_prescription: FinalPrescription | null;
   final_distance_va: FinalDistanceVA | null;
-  total_test_duration_display: string;
+  test_duration_display: string;
   total_steps: number;
   session_start_time: string;
 }
@@ -74,7 +74,7 @@ export interface DashboardRow {
   customer_phone: string;
   final_prescription: FinalPrescription | null;
   final_distance_va: FinalDistanceVA | null;
-  total_test_duration_display: string;
+  test_duration_display: string;
   total_steps: number;
   session_start_time: string;
   manual_rx: ManualRx | null;
