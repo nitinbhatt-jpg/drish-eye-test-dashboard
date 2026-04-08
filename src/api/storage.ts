@@ -3,7 +3,7 @@ import type { EyeVA, FinalDistanceVA, SessionData } from '@/types';
 
 const BUCKET = 'Eye_Test_logs';
 
-const DEMO_NAMES = new Set(['unknown', 'john doe', 'test', 'demo', '']);
+const DEMO_NAMES = new Set(['unknown', 'john doe', 'sid', 'test', 'demo', '']);
 
 function isDemoSession(name: string): boolean {
   return DEMO_NAMES.has(name.toLowerCase().trim());
