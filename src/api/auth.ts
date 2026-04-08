@@ -57,7 +57,11 @@ export async function signIn(email: string, _password?: string) {
 
   if (!error) return data;
 
-  // First-time login: auto-register with the default password, then sign in
+  // Only attempt auto-register for "Invalid login credentials" (user doesn't exist yet)
+  if (error.message !== 'Invalid login credentials') {
+    throw error;
+  }
+
   const { error: signUpErr } = await supabase.auth.signUp({
     email: normalised,
     password: DEFAULT_PASSWORD,

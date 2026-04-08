@@ -3,6 +3,12 @@ import type { EyeVA, FinalDistanceVA, SessionData } from '@/types';
 
 const BUCKET = 'Eye_Test_logs';
 
+const DEMO_NAMES = new Set(['unknown', 'john doe', 'test', 'demo', '']);
+
+function isDemoSession(name: string): boolean {
+  return DEMO_NAMES.has(name.toLowerCase().trim());
+}
+
 function parseEyeVA(raw: unknown): EyeVA | null {
   if (raw == null || typeof raw !== 'object') return null;
   const obj = raw as Record<string, unknown>;
@@ -56,6 +62,7 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
   return results
     .filter((r): r is PromiseFulfilledResult<SessionData> => r.status === 'fulfilled')
     .map((r) => r.value)
+    .filter((s) => !isDemoSession(s.customer_name))
     .sort((a, b) => {
       if (!a.session_start_time && !b.session_start_time) return 0;
       if (!a.session_start_time) return 1;
