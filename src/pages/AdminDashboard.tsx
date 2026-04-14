@@ -12,6 +12,7 @@ import { SessionDetailPanel } from '@/components/dashboard/SessionDetailPanel';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, ChevronRight, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { getPhoroptrName } from '@/lib/utils';
 import type { DashboardRow } from '@/types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -30,6 +31,7 @@ function exportToCsv(rows: DashboardRow[]) {
   const headers = [
     'Customer Name',
     'Phone',
+    'Phoropter ID',
     'Session Date',
     'Duration',
     'AI Right Sph', 'AI Right Cyl', 'AI Right Axis', 'AI Right Add',
@@ -45,6 +47,7 @@ function exportToCsv(rows: DashboardRow[]) {
     return [
       r.customer_name,
       r.customer_phone,
+      getPhoroptrName(r.phoropter_id) || r.phoropter_id,
       r.session_start_time ? new Date(r.session_start_time).toLocaleString() : '',
       r.test_duration_display,
       fmtNum(ai?.right?.sph), fmtNum(ai?.right?.cyl), ai?.right?.axis ?? '', fmtNum(ai?.right?.add),
@@ -70,9 +73,15 @@ type RxFilter = 'all' | 'filled' | 'empty';
 export default function AdminDashboard() {
   const { rows, loading, error, reload, updateManualRx } = useSessionData();
   const [rxFilter, setRxFilter] = useState<RxFilter>('all');
+  const [phoroptrFilter, setPhoroptrFilter] = useState<string>('all');
   const [dateStart, setDateStart] = useState<Date | null>(null);
   const [dateEnd, setDateEnd] = useState<Date | null>(null);
   const [selectedRow, setSelectedRow] = useState<DashboardRow | null>(null);
+
+  const uniquePhoroptrs = useMemo(() => {
+    const ids = new Set(rows.map((r) => r.phoropter_id).filter(Boolean));
+    return Array.from(ids).sort((a, b) => getPhoroptrName(a).localeCompare(getPhoroptrName(b)));
+  }, [rows]);
 
   const handleDateChange = useCallback((start: Date | null, end: Date | null) => {
     setDateStart(start);
@@ -82,11 +91,13 @@ export default function AdminDashboard() {
   const filteredRows = useMemo(() => {
     let result = rows;
 
-    // Rx filter
+    if (phoroptrFilter !== 'all') {
+      result = result.filter((r) => r.phoropter_id.toLowerCase() === phoroptrFilter.toLowerCase());
+    }
+
     if (rxFilter === 'filled') result = result.filter((r) => r.manual_rx != null);
     else if (rxFilter === 'empty') result = result.filter((r) => r.manual_rx == null);
 
-    // Date filter
     if (dateStart || dateEnd) {
       result = result.filter((r) => {
         const d = new Date(r.session_start_time);
@@ -97,7 +108,7 @@ export default function AdminDashboard() {
     }
 
     return result;
-  }, [rows, rxFilter, dateStart, dateEnd]);
+  }, [rows, phoroptrFilter, rxFilter, dateStart, dateEnd]);
 
   const columns: ColumnDef<DashboardRow, unknown>[] = useMemo(
     () => [
@@ -141,6 +152,23 @@ export default function AdminDashboard() {
           return phone
             ? <span className="font-mono text-xs">{phone}</span>
             : <span className="text-sm text-muted-foreground">—</span>;
+        },
+      },
+      {
+        accessorKey: 'phoropter_id',
+        header: 'Phoropter',
+        cell: ({ getValue }) => {
+          const id = getValue<string>();
+          if (!id) return <span className="text-sm text-muted-foreground">—</span>;
+          const name = getPhoroptrName(id);
+          return (
+            <div>
+              <span className="font-medium text-sm">{name}</span>
+              {name !== id && (
+                <span className="block text-[10px] text-muted-foreground font-mono">{id}</span>
+              )}
+            </div>
+          );
         },
       },
       {
@@ -270,6 +298,29 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
+
+      {uniquePhoroptrs.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground">Phoropter:</span>
+          <Button
+            variant={phoroptrFilter === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setPhoroptrFilter('all')}
+          >
+            All
+          </Button>
+          {uniquePhoroptrs.map((id) => (
+            <Button
+              key={id}
+              variant={phoroptrFilter.toLowerCase() === id.toLowerCase() ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setPhoroptrFilter(id)}
+            >
+              {getPhoroptrName(id)}
+            </Button>
+          ))}
+        </div>
+      )}
 
       <DataTable
         columns={columns}

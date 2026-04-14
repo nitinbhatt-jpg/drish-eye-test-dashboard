@@ -48,6 +48,7 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
 
       return {
         session_id: json.session_id,
+        phoropter_id: json.phoropter_id ?? '',
         customer_name: json.customer_name ?? json.patient_input?.patient_name ?? 'Unknown',
         customer_phone: json.customer_phone ?? '',
         final_prescription: json.final_prescription ?? { right: { sph: 0, cyl: 0, axis: 0, add: 0 }, left: { sph: 0, cyl: 0, axis: 0, add: 0 } },

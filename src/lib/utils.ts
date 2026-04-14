@@ -6,6 +6,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const PHOROPTER_NAME_MAP: Record<string, string> = {
+  'cv5000pc': 'Lenskart-HQ',
+  'lkst1782-1': 'Delta Tower',
+  'lenskart-bhiwadi': 'Lenskart-Bhiwadi',
+};
+
+export function getPhoroptrName(id: string): string {
+  if (!id) return '';
+  return PHOROPTER_NAME_MAP[id.toLowerCase().trim()] ?? id;
+}
+
 function fmtNum(val: number | null): string {
   if (val == null) return '—';
   return val >= 0 ? `+${val.toFixed(2)}` : val.toFixed(2);

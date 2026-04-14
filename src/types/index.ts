@@ -30,6 +30,7 @@ export interface FinalDistanceVA {
 
 export interface SessionData {
   session_id: string;
+  phoropter_id: string;
   customer_name: string;
   customer_phone: string;
   final_prescription: FinalPrescription | null;
@@ -70,6 +71,7 @@ export interface ManualRxInput {
 
 export interface DashboardRow {
   session_id: string;
+  phoropter_id: string;
   customer_name: string;
   customer_phone: string;
   final_prescription: FinalPrescription | null;
