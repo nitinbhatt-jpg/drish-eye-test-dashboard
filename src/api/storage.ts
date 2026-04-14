@@ -28,16 +28,6 @@ function extractFinalDistanceVA(json: Record<string, unknown>): FinalDistanceVA 
   return { right, left };
 }
 
-async function downloadJson(fileName: string): Promise<Record<string, unknown> | null> {
-  const { data, error } = await supabase.storage.from(BUCKET).download(fileName);
-  if (error) return null;
-  try {
-    return JSON.parse(await data.text());
-  } catch {
-    return null;
-  }
-}
-
 export async function fetchAllSessionData(): Promise<SessionData[]> {
   const { data: files, error: listError } = await supabase.storage
     .from(BUCKET)
@@ -46,37 +36,26 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
   if (listError) throw listError;
   if (!files) return [];
 
-  const mainFiles = files.filter((f) => f.name.endsWith('.json') && !f.name.endsWith('_metadata.json'));
-  const metadataFileSet = new Set(
-    files.filter((f) => f.name.endsWith('_metadata.json')).map((f) => f.name),
-  );
+  const jsonFiles = files.filter((f) => f.name.endsWith('.json'));
 
   const results = await Promise.allSettled(
-    mainFiles.map(async (file) => {
-      const json = await downloadJson(file.name);
-      if (!json) throw new Error(`Failed to parse ${file.name}`);
+    jsonFiles.map(async (file) => {
+      const { data, error } = await supabase.storage.from(BUCKET).download(file.name);
+      if (error) throw error;
 
-      let phoropter_id = (json.phoropter_id as string) ?? '';
-
-      if (!phoropter_id) {
-        const sid = json.session_id as string;
-        const metaName = `${sid}_metadata.json`;
-        if (metaName && metadataFileSet.has(metaName)) {
-          const meta = await downloadJson(metaName);
-          if (meta) phoropter_id = (meta.phoropter_id as string) ?? '';
-        }
-      }
+      const text = await data.text();
+      const json = JSON.parse(text);
 
       return {
-        session_id: String(json.session_id ?? ''),
-        phoropter_id,
-        customer_name: String(json.customer_name ?? (json.patient_input as Record<string, unknown> | undefined)?.patient_name ?? 'Unknown'),
-        customer_phone: String(json.customer_phone ?? ''),
-        final_prescription: (json.final_prescription ?? { right: { sph: 0, cyl: 0, axis: 0, add: 0 }, left: { sph: 0, cyl: 0, axis: 0, add: 0 } }) as SessionData['final_prescription'],
+        session_id: json.session_id,
+        phoropter_id: json.phoropter_id ?? '',
+        customer_name: json.customer_name ?? json.patient_input?.patient_name ?? 'Unknown',
+        customer_phone: json.customer_phone ?? '',
+        final_prescription: json.final_prescription ?? { right: { sph: 0, cyl: 0, axis: 0, add: 0 }, left: { sph: 0, cyl: 0, axis: 0, add: 0 } },
         final_distance_va: extractFinalDistanceVA(json),
-        test_duration_display: String(json.test_duration_display ?? '—'),
-        total_steps: Number(json.total_steps ?? 0),
-        session_start_time: String(json.session_start_time ?? ''),
+        test_duration_display: json.test_duration_display ?? '—',
+        total_steps: json.total_steps ?? 0,
+        session_start_time: json.session_start_time ?? '',
       } satisfies SessionData;
     }),
   );
