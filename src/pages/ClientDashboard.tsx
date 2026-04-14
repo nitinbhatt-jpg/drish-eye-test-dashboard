@@ -125,25 +125,20 @@ export default function ClientDashboard() {
       </div>
 
       {uniquePhoroptrs.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-muted-foreground">Phoropter:</span>
-          <Button
-            variant={phoroptrFilter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setPhoroptrFilter('all')}
+          <select
+            value={phoroptrFilter}
+            onChange={(e) => setPhoroptrFilter(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            All
-          </Button>
-          {uniquePhoroptrs.map((id) => (
-            <Button
-              key={id}
-              variant={phoroptrFilter.toLowerCase() === id.toLowerCase() ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setPhoroptrFilter(id)}
-            >
-              {getPhoroptrName(id)}
-            </Button>
-          ))}
+            <option value="all">All Phoropters</option>
+            {uniquePhoroptrs.map((id) => (
+              <option key={id} value={id}>
+                {getPhoroptrName(id)}{getPhoroptrName(id) !== id ? ` (${id})` : ''}
+              </option>
+            ))}
+          </select>
         </div>
       )}
       <MetricsSummary rows={filteredRows} />

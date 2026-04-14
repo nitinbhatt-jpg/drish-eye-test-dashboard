@@ -9,6 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 const PHOROPTER_NAME_MAP: Record<string, string> = {
   'cv5000pc': 'Lenskart-HQ',
   'lkst1782-1': 'Delta Tower',
+  'lkst1878-1': 'Delta Tower',
+  'lkst2001-1': 'LKST2001-1',
+  'lkst2021-1': 'LKST2021-1',
+  'lkst2022-1': 'LKST2022-1',
   'lenskart-bhiwadi': 'Lenskart-Bhiwadi',
 };
 
