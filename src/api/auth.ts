@@ -21,7 +21,7 @@ const ADMIN_EMAILS = new Set([
   'harpratap.malhi@lenskart.in',
 ]);
 
-const DEFAULT_PASSWORD = 'Lenskart@123';
+const DEFAULT_PASSWORD = 'LK@123';
 
 function isClientEmail(email: string): boolean {
   return CLIENT_EMAILS.has(email.toLowerCase().trim());
