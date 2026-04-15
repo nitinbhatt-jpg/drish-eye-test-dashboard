@@ -21,7 +21,8 @@ const ADMIN_EMAILS = new Set([
   'harpratap.malhi@lenskart.in',
 ]);
 
-const DEFAULT_PASSWORD = 'LK@123';
+const ADMIN_PASSWORD = 'LK@123';
+const CLIENT_PASSWORD = 'Lenskart@123';
 
 function isClientEmail(email: string): boolean {
   return CLIENT_EMAILS.has(email.toLowerCase().trim());
@@ -51,27 +52,28 @@ export async function signIn(email: string, _password?: string) {
     throw new Error('This email is not authorised to access the dashboard.');
   }
 
+  const password = isAdminEmail(normalised) ? ADMIN_PASSWORD : CLIENT_PASSWORD;
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: normalised,
-    password: DEFAULT_PASSWORD,
+    password,
   });
 
   if (!error) return data;
 
-  // Only attempt auto-register for "Invalid login credentials" (user doesn't exist yet)
   if (error.message !== 'Invalid login credentials') {
     throw error;
   }
 
   const { error: signUpErr } = await supabase.auth.signUp({
     email: normalised,
-    password: DEFAULT_PASSWORD,
+    password,
   });
   if (signUpErr) throw signUpErr;
 
   const { data: retryData, error: retryErr } = await supabase.auth.signInWithPassword({
     email: normalised,
-    password: DEFAULT_PASSWORD,
+    password,
   });
   if (retryErr) throw retryErr;
   return retryData;
