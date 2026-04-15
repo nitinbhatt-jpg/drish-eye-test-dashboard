@@ -18,8 +18,12 @@ export default function ClientDashboard() {
   const [phoroptrFilter, setPhoroptrFilter] = useState<string>('all');
 
   const uniquePhoroptrs = useMemo(() => {
-    const ids = new Set(rows.map((r) => r.phoropter_id).filter(Boolean));
-    return Array.from(ids).sort((a, b) => getPhoroptrName(a).localeCompare(getPhoroptrName(b)));
+    const seen = new Map<string, string>();
+    for (const r of rows) {
+      const id = r.phoropter_id;
+      if (id && !seen.has(id.toLowerCase())) seen.set(id.toLowerCase(), id);
+    }
+    return Array.from(seen.values()).sort((a, b) => getPhoroptrName(a).localeCompare(getPhoroptrName(b)));
   }, [rows]);
 
   const filteredRows = useMemo(() => {
