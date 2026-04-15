@@ -18,6 +18,7 @@ const ADMIN_EMAILS = new Set([
   'nitin.bhatt@lenskart.com',
   'shantanu.chandra@lenskart.com',
   'siddarth.gupta@lenskart.com',
+  'harpratap.malhi@lenskart.in',
 ]);
 
 const DEFAULT_PASSWORD = 'Lenskart@123';

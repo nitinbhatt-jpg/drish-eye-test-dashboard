@@ -68,7 +68,8 @@ BEGIN
   IF NEW.email IN (
     'nitin.bhatt@lenskart.com',
     'shantanu.chandra@lenskart.com',
-    'siddarth.gupta@lenskart.com'
+    'siddarth.gupta@lenskart.com',
+    'harpratap.malhi@lenskart.in'
   ) THEN
     INSERT INTO public.profiles (id, role) VALUES (NEW.id, 'admin');
   ELSE
