@@ -79,12 +79,12 @@ export default function AdminDashboard() {
   const [selectedRow, setSelectedRow] = useState<DashboardRow | null>(null);
 
   const uniquePhoroptrs = useMemo(() => {
-    const seen = new Map<string, string>();
+    const seen = new Set<string>();
     for (const r of rows) {
-      const id = r.phoropter_id;
-      if (id && !seen.has(id.toLowerCase())) seen.set(id.toLowerCase(), id);
+      const name = getPhoroptrName(r.phoropter_id);
+      if (name) seen.add(name);
     }
-    return Array.from(seen.values()).sort((a, b) => getPhoroptrName(a).localeCompare(getPhoroptrName(b)));
+    return Array.from(seen).sort((a, b) => a.localeCompare(b));
   }, [rows]);
 
   const handleDateChange = useCallback((start: Date | null, end: Date | null) => {
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
     let result = rows;
 
     if (phoroptrFilter !== 'all') {
-      result = result.filter((r) => r.phoropter_id.toLowerCase() === phoroptrFilter.toLowerCase());
+      result = result.filter((r) => getPhoroptrName(r.phoropter_id) === phoroptrFilter);
     }
 
     if (rxFilter === 'filled') result = result.filter((r) => r.manual_rx != null);
@@ -312,9 +312,9 @@ export default function AdminDashboard() {
             className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
             <option value="all">All Phoropters</option>
-            {uniquePhoroptrs.map((id) => (
-              <option key={id} value={id}>
-                {getPhoroptrName(id)}{getPhoroptrName(id) !== id ? ` (${id})` : ''}
+            {uniquePhoroptrs.map((name) => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </select>
