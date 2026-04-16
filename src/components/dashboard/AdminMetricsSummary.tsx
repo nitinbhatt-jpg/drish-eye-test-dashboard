@@ -1,4 +1,4 @@
-import { Activity, ClipboardCheck, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Activity, ClipboardCheck, Clock, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { DashboardRow } from '@/types';
 import { axisToleranceFromCylDev } from '@/lib/tolerances';
@@ -40,31 +40,6 @@ function computeAccuracy(row: DashboardRow): number | null {
   return checks.filter(Boolean).length / checks.length;
 }
 
-function hasHighDeviation(row: DashboardRow): boolean {
-  const ai = row.final_prescription;
-  const m = row.manual_rx;
-  if (!ai || !m) return false;
-
-  function exceeds(aiVal: number | null | undefined, mVal: number | null, threshold: number): boolean {
-    if (aiVal == null || mVal == null) return false;
-    return Math.abs(aiVal - mVal) > threshold;
-  }
-
-  const rAxisTol = axisToleranceFromCylDev(cylDev(ai.right?.cyl, m.right_cyl));
-  const lAxisTol = axisToleranceFromCylDev(cylDev(ai.left?.cyl, m.left_cyl));
-
-  return (
-    exceeds(ai.right?.sph, m.right_sph, 0.25) ||
-    exceeds(ai.right?.cyl, m.right_cyl, 0.25) ||
-    exceeds(ai.right?.axis, m.right_axis, rAxisTol) ||
-    exceeds(ai.right?.add, m.right_add, 0.25) ||
-    exceeds(ai.left?.sph, m.left_sph, 0.25) ||
-    exceeds(ai.left?.cyl, m.left_cyl, 0.25) ||
-    exceeds(ai.left?.axis, m.left_axis, lAxisTol) ||
-    exceeds(ai.left?.add, m.left_add, 0.25)
-  );
-}
-
 export function AdminMetricsSummary({ rows }: AdminMetricsSummaryProps) {
   const totalAI = rows.length;
   const totalManual = rows.filter((r) => r.manual_rx != null).length;
@@ -74,8 +49,6 @@ export function AdminMetricsSummary({ rows }: AdminMetricsSummaryProps) {
   const avgAccuracy = accuracies.length > 0
     ? Math.round((accuracies.reduce((a, b) => a + b, 0) / accuracies.length) * 100)
     : null;
-
-  const highDevCount = rows.filter(hasHighDeviation).length;
 
   const metrics = [
     {
@@ -110,17 +83,10 @@ export function AdminMetricsSummary({ rows }: AdminMetricsSummaryProps) {
         ? 'text-green-600 dark:text-green-400'
         : 'text-red-600 dark:text-red-400',
     },
-    {
-      label: 'High Deviation',
-      value: highDevCount,
-      icon: AlertTriangle,
-      bg: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-      valueColor: 'text-red-600 dark:text-red-400',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {metrics.map((m) => (
         <Card key={m.label}>
           <CardContent className="flex items-center gap-3 p-4">
