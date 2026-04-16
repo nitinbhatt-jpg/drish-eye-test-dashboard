@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { EyePowerDisplay } from './EyePowerDisplay';
 import { DeviationDisplay } from './DeviationDisplay';
 import type { DashboardRow } from '@/types';
+import { axisToleranceFromCylDev } from '@/lib/tolerances';
 
 interface SessionDetailPanelProps {
   row: DashboardRow | null;
@@ -12,13 +13,6 @@ interface SessionDetailPanelProps {
 function fmtVal(val: number | null | undefined): string {
   if (val == null) return '—';
   return val >= 0 ? `+${val.toFixed(2)}` : val.toFixed(2);
-}
-
-function axisToleranceFromCylDeviation(cylDev: number | null): number {
-  if (cylDev == null) return 5;
-  if (cylDev <= 0.25) return 15;
-  if (cylDev <= 1.0) return 10;
-  return 5;
 }
 
 function AccuracyCalc({ row }: { row: DashboardRow }) {
@@ -33,16 +27,16 @@ function AccuracyCalc({ row }: { row: DashboardRow }) {
     }
   }
 
-  const rCylDev = ai.right?.cyl != null && m.right_cyl != null ? Math.abs(ai.right.cyl - m.right_cyl) : null;
-  const lCylDev = ai.left?.cyl != null && m.left_cyl != null ? Math.abs(ai.left.cyl - m.left_cyl) : null;
+  const rCylDev = (ai.right?.cyl != null && m.right_cyl != null) ? Math.abs(ai.right.cyl - m.right_cyl) : null;
+  const lCylDev = (ai.left?.cyl != null && m.left_cyl != null) ? Math.abs(ai.left.cyl - m.left_cyl) : null;
 
   check(ai.right?.sph, m.right_sph, 0.25);
   check(ai.right?.cyl, m.right_cyl, 0.25);
-  check(ai.right?.axis, m.right_axis, axisToleranceFromCylDeviation(rCylDev));
+  check(ai.right?.axis, m.right_axis, axisToleranceFromCylDev(rCylDev));
   check(ai.right?.add, m.right_add, 0.25);
   check(ai.left?.sph, m.left_sph, 0.25);
   check(ai.left?.cyl, m.left_cyl, 0.25);
-  check(ai.left?.axis, m.left_axis, axisToleranceFromCylDeviation(lCylDev));
+  check(ai.left?.axis, m.left_axis, axisToleranceFromCylDev(lCylDev));
   check(ai.left?.add, m.left_add, 0.25);
 
   if (checks.length === 0) return <span className="text-muted-foreground">—</span>;
