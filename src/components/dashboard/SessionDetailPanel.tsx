@@ -27,11 +27,11 @@ function AccuracyCalc({ row }: { row: DashboardRow }) {
   }
   check(ai.right?.sph, m.right_sph, 0.25);
   check(ai.right?.cyl, m.right_cyl, 0.25);
-  check(ai.right?.axis, m.right_axis, 10);
+  check(ai.right?.axis, m.right_axis, 5);
   check(ai.right?.add, m.right_add, 0.25);
   check(ai.left?.sph, m.left_sph, 0.25);
   check(ai.left?.cyl, m.left_cyl, 0.25);
-  check(ai.left?.axis, m.left_axis, 10);
+  check(ai.left?.axis, m.left_axis, 5);
   check(ai.left?.add, m.left_add, 0.25);
 
   if (checks.length === 0) return <span className="text-muted-foreground">—</span>;

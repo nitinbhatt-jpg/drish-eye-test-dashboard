@@ -16,7 +16,7 @@ function collectScores(
   const scores: number[] = [];
   if (ai.sph != null && mSph != null) scores.push(Math.abs(ai.sph - mSph) <= 0.25 ? 1 : 0);
   if (ai.cyl != null && mCyl != null) scores.push(Math.abs(ai.cyl - mCyl) <= 0.25 ? 1 : 0);
-  if (ai.axis != null && mAxis != null) scores.push(Math.abs(ai.axis - mAxis) <= 10 ? 1 : 0);
+  if (ai.axis != null && mAxis != null) scores.push(Math.abs(ai.axis - mAxis) <= 5 ? 1 : 0);
   if (ai.add != null) scores.push(mAdd != null ? (Math.abs(ai.add - mAdd) <= 0.25 ? 1 : 0) : 0);
   return scores;
 }

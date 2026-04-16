@@ -46,7 +46,7 @@ export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
         </span>
         <span>
           <span className="text-muted-foreground font-normal">Axis:</span>{' '}
-          <span className={deviationClass(dAxis, 10)}>{fmtDev(dAxis)}</span>
+          <span className={deviationClass(dAxis, 5)}>{fmtDev(dAxis)}</span>
         </span>
         <span>
           <span className="text-muted-foreground font-normal">Add:</span>{' '}
