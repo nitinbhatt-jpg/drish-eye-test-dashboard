@@ -22,6 +22,13 @@ function deviationClass(val: number | null, threshold: number): string {
   return 'text-red-600 dark:text-red-400 underline';
 }
 
+function axisToleranceFromCylDeviation(cylDev: number | null): number {
+  if (cylDev == null) return 5;
+  if (cylDev <= 0.25) return 15;
+  if (cylDev <= 1.0) return 10;
+  return 5;
+}
+
 export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
   if (!ai || !manual) {
     return <span className="text-muted-foreground text-sm">—</span>;
@@ -31,6 +38,7 @@ export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
   const dCyl = absDiff(ai.cyl, manual.cyl);
   const dAxis = absDiff(ai.axis, manual.axis);
   const dAdd = absDiff(ai.add, manual.add);
+  const axisTol = axisToleranceFromCylDeviation(dCyl);
 
   return (
     <div className="space-y-0.5">
@@ -46,7 +54,7 @@ export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
         </span>
         <span>
           <span className="text-muted-foreground font-normal">Axis:</span>{' '}
-          <span className={deviationClass(dAxis, 5)}>{fmtDev(dAxis)}</span>
+          <span className={deviationClass(dAxis, axisTol)}>{fmtDev(dAxis)}</span>
         </span>
         <span>
           <span className="text-muted-foreground font-normal">Add:</span>{' '}

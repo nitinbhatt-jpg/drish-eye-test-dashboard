@@ -6,6 +6,18 @@ interface AdminMetricsSummaryProps {
   rows: DashboardRow[];
 }
 
+function axisToleranceFromCylDeviation(cylDev: number | null): number {
+  if (cylDev == null) return 5;
+  if (cylDev <= 0.25) return 15;
+  if (cylDev <= 1.0) return 10;
+  return 5;
+}
+
+function cylDeviation(aiCyl: number | null | undefined, mCyl: number | null): number | null {
+  if (aiCyl == null || mCyl == null) return null;
+  return Math.abs(aiCyl - mCyl);
+}
+
 function computeAccuracy(row: DashboardRow): number | null {
   const ai = row.final_prescription;
   const m = row.manual_rx;
@@ -17,13 +29,17 @@ function computeAccuracy(row: DashboardRow): number | null {
       checks.push(mVal != null ? Math.abs(aiVal - mVal) <= threshold : false);
     }
   }
+
+  const rightAxisTol = axisToleranceFromCylDeviation(cylDeviation(ai.right?.cyl, m.right_cyl));
+  const leftAxisTol = axisToleranceFromCylDeviation(cylDeviation(ai.left?.cyl, m.left_cyl));
+
   check(ai.right?.sph, m.right_sph, 0.25);
   check(ai.right?.cyl, m.right_cyl, 0.25);
-  check(ai.right?.axis, m.right_axis, 5);
+  check(ai.right?.axis, m.right_axis, rightAxisTol);
   check(ai.right?.add, m.right_add, 0.25);
   check(ai.left?.sph, m.left_sph, 0.25);
   check(ai.left?.cyl, m.left_cyl, 0.25);
-  check(ai.left?.axis, m.left_axis, 5);
+  check(ai.left?.axis, m.left_axis, leftAxisTol);
   check(ai.left?.add, m.left_add, 0.25);
 
   if (checks.length === 0) return null;
@@ -40,14 +56,17 @@ function hasHighDeviation(row: DashboardRow): boolean {
     return Math.abs(aiVal - mVal) > threshold;
   }
 
+  const rightAxisTol = axisToleranceFromCylDeviation(cylDeviation(ai.right?.cyl, m.right_cyl));
+  const leftAxisTol = axisToleranceFromCylDeviation(cylDeviation(ai.left?.cyl, m.left_cyl));
+
   return (
     exceeds(ai.right?.sph, m.right_sph, 0.25) ||
     exceeds(ai.right?.cyl, m.right_cyl, 0.25) ||
-    exceeds(ai.right?.axis, m.right_axis, 5) ||
+    exceeds(ai.right?.axis, m.right_axis, rightAxisTol) ||
     exceeds(ai.right?.add, m.right_add, 0.25) ||
     exceeds(ai.left?.sph, m.left_sph, 0.25) ||
     exceeds(ai.left?.cyl, m.left_cyl, 0.25) ||
-    exceeds(ai.left?.axis, m.left_axis, 5) ||
+    exceeds(ai.left?.axis, m.left_axis, leftAxisTol) ||
     exceeds(ai.left?.add, m.left_add, 0.25)
   );
 }
