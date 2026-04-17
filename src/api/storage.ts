@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { EyeVA, FinalDistanceVA, SessionData } from '@/types';
+import type { EyeVA, FinalDistanceVA, FinalPrescription, SessionData } from '@/types';
 
 const BUCKET = 'Eye_Test_logs';
 
@@ -26,6 +26,34 @@ function extractFinalDistanceVA(json: Record<string, unknown>): FinalDistanceVA 
   const left = parseEyeVA(obj.left);
   if (!right && !left) return null;
   return { right, left };
+}
+
+/** Pairs of session IDs whose `final_prescription` in storage were swapped at upload time. */
+const SWAPPED_FINAL_PRESCRIPTION_SESSION_PAIRS: readonly (readonly [string, string])[] = [
+  ['session_1776239716153', 'session_1776238444193'],
+];
+
+function applySwappedFinalPrescriptionCorrections(sessions: SessionData[]): SessionData[] {
+  const indexById = new Map(sessions.map((s, i) => [s.session_id, i]));
+  const overrides = new Map<string, FinalPrescription | null>();
+
+  for (const [idA, idB] of SWAPPED_FINAL_PRESCRIPTION_SESSION_PAIRS) {
+    const ia = indexById.get(idA);
+    const ib = indexById.get(idB);
+    if (ia === undefined || ib === undefined) continue;
+    const a = sessions[ia];
+    const b = sessions[ib];
+    overrides.set(idA, b.final_prescription);
+    overrides.set(idB, a.final_prescription);
+  }
+
+  if (overrides.size === 0) return sessions;
+
+  return sessions.map((s) => {
+    const next = overrides.get(s.session_id);
+    if (next === undefined) return s;
+    return { ...s, final_prescription: next };
+  });
 }
 
 export async function fetchAllSessionData(): Promise<SessionData[]> {
@@ -60,7 +88,7 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
     }),
   );
 
-  return results
+  const sessions = results
     .filter((r): r is PromiseFulfilledResult<SessionData> => r.status === 'fulfilled')
     .map((r) => r.value)
     .filter((s) => !isDemoSession(s.customer_name))
@@ -70,4 +98,6 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
       if (!b.session_start_time) return -1;
       return new Date(b.session_start_time).getTime() - new Date(a.session_start_time).getTime();
     });
+
+  return applySwappedFinalPrescriptionCorrections(sessions);
 }
