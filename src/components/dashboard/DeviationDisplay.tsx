@@ -1,5 +1,5 @@
 import type { EyePower } from '@/types';
-import { axisToleranceFromCyl } from '@/lib/tolerances';
+import { axisToleranceFromCyl, axisDiff } from '@/lib/tolerances';
 
 interface DeviationDisplayProps {
   ai: EyePower | null | undefined;
@@ -30,7 +30,7 @@ export function DeviationDisplay({ ai, manual, label }: DeviationDisplayProps) {
 
   const dSph = absDiff(ai.sph, manual.sph);
   const dCyl = absDiff(ai.cyl, manual.cyl);
-  const dAxis = absDiff(ai.axis, manual.axis);
+  const dAxis = axisDiff(ai.axis, manual.axis);
   const dAdd = absDiff(ai.add, manual.add);
   const axisTol = axisToleranceFromCyl(manual.cyl);
 

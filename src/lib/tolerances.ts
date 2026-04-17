@@ -12,3 +12,14 @@ export function axisToleranceFromCyl(manualCyl: number | null | undefined): numb
   if (abs <= 1.0) return 10;
   return 5;
 }
+
+/**
+ * Circular axis difference wrapped at 180°.
+ * Axis values range 0–180 where 0° and 180° are the same meridian.
+ * e.g. axisDiff(180, 20) = 20, not 160.
+ */
+export function axisDiff(a: number | null | undefined, b: number | null | undefined): number | null {
+  if (a == null || b == null) return null;
+  const diff = Math.abs(a - b);
+  return Math.min(diff, 180 - diff);
+}

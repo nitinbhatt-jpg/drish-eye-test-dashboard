@@ -1,7 +1,7 @@
 import { Activity, ClipboardCheck, Clock, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { DashboardRow } from '@/types';
-import { axisToleranceFromCyl } from '@/lib/tolerances';
+import { axisToleranceFromCyl, axisDiff } from '@/lib/tolerances';
 
 interface AdminMetricsSummaryProps {
   rows: DashboardRow[];
@@ -18,14 +18,20 @@ function computeAccuracy(row: DashboardRow): number | null {
       checks.push(mVal != null ? Math.abs(aiVal - mVal) <= threshold : false);
     }
   }
+  function checkAxis(aiAxis: number | null | undefined, mAxis: number | null, threshold: number) {
+    const diff = axisDiff(aiAxis, mAxis);
+    if (aiAxis != null) {
+      checks.push(diff != null ? diff <= threshold : false);
+    }
+  }
 
   check(ai.right?.sph, m.right_sph, 0.25);
   check(ai.right?.cyl, m.right_cyl, 0.25);
-  check(ai.right?.axis, m.right_axis, axisToleranceFromCyl(m.right_cyl));
+  checkAxis(ai.right?.axis, m.right_axis, axisToleranceFromCyl(m.right_cyl));
   check(ai.right?.add, m.right_add, 0.25);
   check(ai.left?.sph, m.left_sph, 0.25);
   check(ai.left?.cyl, m.left_cyl, 0.25);
-  check(ai.left?.axis, m.left_axis, axisToleranceFromCyl(m.left_cyl));
+  checkAxis(ai.left?.axis, m.left_axis, axisToleranceFromCyl(m.left_cyl));
   check(ai.left?.add, m.left_add, 0.25);
 
   if (checks.length === 0) return null;

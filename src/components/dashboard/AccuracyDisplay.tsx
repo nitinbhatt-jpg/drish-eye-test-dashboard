@@ -1,5 +1,5 @@
 import type { EyePower, FinalPrescription, ManualRx } from '@/types';
-import { axisToleranceFromCyl } from '@/lib/tolerances';
+import { axisToleranceFromCyl, axisDiff } from '@/lib/tolerances';
 
 interface AccuracyDisplayProps {
   ai: FinalPrescription | null | undefined;
@@ -18,7 +18,8 @@ function collectScores(
   const axisTol = axisToleranceFromCyl(mCyl);
   if (ai.sph != null && mSph != null) scores.push(Math.abs(ai.sph - mSph) <= 0.25 ? 1 : 0);
   if (ai.cyl != null && mCyl != null) scores.push(Math.abs(ai.cyl - mCyl) <= 0.25 ? 1 : 0);
-  if (ai.axis != null && mAxis != null) scores.push(Math.abs(ai.axis - mAxis) <= axisTol ? 1 : 0);
+  const axDiff = axisDiff(ai.axis, mAxis);
+  if (axDiff != null) scores.push(axDiff <= axisTol ? 1 : 0);
   if (ai.add != null) scores.push(mAdd != null ? (Math.abs(ai.add - mAdd) <= 0.25 ? 1 : 0) : 0);
   return scores;
 }
