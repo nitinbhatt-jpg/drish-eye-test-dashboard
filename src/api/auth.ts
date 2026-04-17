@@ -12,6 +12,7 @@ const CLIENT_EMAILS = new Set([
   'rimi.das@fos.lenskart.in',
   'yogesh.kumar3@fos.lenskart.in',
   'priya.das@fos.lenskart.in',
+  'anurag.shukla4@fos.lenskart.in',
 ]);
 
 const ADMIN_EMAILS = new Set([
