@@ -28,30 +28,25 @@ function extractFinalDistanceVA(json: Record<string, unknown>): FinalDistanceVA 
   return { right, left };
 }
 
-/** Pairs of session IDs whose `final_prescription` in storage were swapped at upload time. */
-const SWAPPED_FINAL_PRESCRIPTION_SESSION_PAIRS: readonly (readonly [string, string])[] = [
-  ['session_1776239716153', 'session_1776238444193'],
-];
+/**
+ * Canonical Self ET (AI) `final_prescription` for sessions that were saved with swapped/wrong AI Rx.
+ * Keys are `session_id` from metadata; values match clinical correction (tanu / divyanshi).
+ */
+const FINAL_PRESCRIPTION_BY_SESSION_ID: Readonly<Record<string, FinalPrescription>> = {
+  session_1776239716153: {
+    right: { sph: -0.5, cyl: -0.5, axis: 170, add: 0 },
+    left: { sph: -0.5, cyl: -0.25, axis: 170, add: 0 },
+  },
+  session_1776238444193: {
+    right: { sph: 0, cyl: -1.25, axis: 160, add: 0 },
+    left: { sph: 0, cyl: -2, axis: 15, add: 0 },
+  },
+};
 
-function applySwappedFinalPrescriptionCorrections(sessions: SessionData[]): SessionData[] {
-  const indexById = new Map(sessions.map((s, i) => [s.session_id, i]));
-  const overrides = new Map<string, FinalPrescription | null>();
-
-  for (const [idA, idB] of SWAPPED_FINAL_PRESCRIPTION_SESSION_PAIRS) {
-    const ia = indexById.get(idA);
-    const ib = indexById.get(idB);
-    if (ia === undefined || ib === undefined) continue;
-    const a = sessions[ia];
-    const b = sessions[ib];
-    overrides.set(idA, b.final_prescription);
-    overrides.set(idB, a.final_prescription);
-  }
-
-  if (overrides.size === 0) return sessions;
-
+function applyKnownFinalPrescriptionCorrections(sessions: SessionData[]): SessionData[] {
   return sessions.map((s) => {
-    const next = overrides.get(s.session_id);
-    if (next === undefined) return s;
+    const next = FINAL_PRESCRIPTION_BY_SESSION_ID[s.session_id];
+    if (!next) return s;
     return { ...s, final_prescription: next };
   });
 }
@@ -99,5 +94,5 @@ export async function fetchAllSessionData(): Promise<SessionData[]> {
       return new Date(b.session_start_time).getTime() - new Date(a.session_start_time).getTime();
     });
 
-  return applySwappedFinalPrescriptionCorrections(sessions);
+  return applyKnownFinalPrescriptionCorrections(sessions);
 }

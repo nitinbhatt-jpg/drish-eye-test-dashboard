@@ -1,6 +1,6 @@
 /**
- * Rewrites `final_prescription` inside two known metadata JSON files in Storage
- * (corrects swapped AI Rx). Requires a Supabase **service role** key (bypasses RLS).
+ * Writes canonical `final_prescription` into two metadata JSON files in Storage
+ * (tanu / divyanshi corrected AI Rx). Requires a Supabase **service role** key.
  *
  * Usage (from repo root):
  *   SUPABASE_SERVICE_ROLE_KEY=... node scripts/fix-storage-prescription-swap.mjs
@@ -37,9 +37,17 @@ if (!url || !serviceKey) {
 }
 
 const BUCKET = 'Eye_Test_logs';
-const PAIRS = [
-  ['session_1776239716153_metadata.json', 'session_1776238444193_metadata.json'],
-];
+
+const FINAL_PRESCRIPTION_BY_FILE = {
+  'session_1776239716153_metadata.json': {
+    right: { sph: -0.5, cyl: -0.5, axis: 170, add: 0 },
+    left: { sph: -0.5, cyl: -0.25, axis: 170, add: 0 },
+  },
+  'session_1776238444193_metadata.json': {
+    right: { sph: 0, cyl: -1.25, axis: 160, add: 0 },
+    left: { sph: 0, cyl: -2, axis: 15, add: 0 },
+  },
+};
 
 const supabase = createClient(url, serviceKey);
 
@@ -58,14 +66,11 @@ async function uploadJson(path, obj) {
   if (error) throw error;
 }
 
-for (const [a, b] of PAIRS) {
-  const [ja, jb] = await Promise.all([loadJson(a), loadJson(b)]);
-  const fpA = ja.final_prescription;
-  const fpB = jb.final_prescription;
-  ja.final_prescription = fpB;
-  jb.final_prescription = fpA;
-  await Promise.all([uploadJson(a, ja), uploadJson(b, jb)]);
-  console.log('Swapped final_prescription in', a, '<->', b);
+for (const [path, final_prescription] of Object.entries(FINAL_PRESCRIPTION_BY_FILE)) {
+  const doc = await loadJson(path);
+  doc.final_prescription = final_prescription;
+  await uploadJson(path, doc);
+  console.log('Set final_prescription in', path);
 }
 
 console.log('Done.');
