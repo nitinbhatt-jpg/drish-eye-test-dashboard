@@ -1,6 +1,18 @@
 import { supabase } from '@/lib/supabase';
 import type { ManualRx, ManualRxInput } from '@/types';
 
+function applyDefaults(rx: ManualRx): ManualRx {
+  return {
+    ...rx,
+    right_cyl: rx.right_cyl ?? 0,
+    right_axis: rx.right_axis ?? 180,
+    right_add: rx.right_add ?? 0,
+    left_cyl: rx.left_cyl ?? 0,
+    left_axis: rx.left_axis ?? 180,
+    left_add: rx.left_add ?? 0,
+  };
+}
+
 export async function fetchAllManualRx(): Promise<ManualRx[]> {
   const { data, error } = await supabase
     .from('manual_rx')
@@ -8,7 +20,7 @@ export async function fetchAllManualRx(): Promise<ManualRx[]> {
     .order('updated_at', { ascending: false });
 
   if (error) throw error;
-  return (data ?? []) as ManualRx[];
+  return ((data ?? []) as ManualRx[]).map(applyDefaults);
 }
 
 export async function upsertManualRx(input: ManualRxInput): Promise<ManualRx> {
@@ -37,5 +49,5 @@ export async function upsertManualRx(input: ManualRxInput): Promise<ManualRx> {
     .single();
 
   if (error) throw error;
-  return data as ManualRx;
+  return applyDefaults(data as ManualRx);
 }
